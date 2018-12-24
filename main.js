@@ -23,14 +23,15 @@ loader
     ])
     .load(setup);
 
-let car, carEnemy, carEnemy2, background, background2;
+let car, background, background2;
+let carsEnemy = [];
 
 function setup() {
     background = new PIXI.extras.TilingSprite(resources["images/way.png"].texture, app.screen.width, app.screen.height +1);
     background2 = new PIXI.extras.TilingSprite(resources["images/way.png"].texture, app.screen.width, app.screen.height +1);
 
-    background.vy = 3;
-    background2.vy = 3;
+    background.vy = 5;
+    background2.vy = 5;
 
     background.y = 0;
     background2.y = -app.screen.height;
@@ -45,13 +46,17 @@ function setup() {
     car.vx = 0;
     car.vy = 0;
 
-    carEnemy = generateCar();
+    carsEnemy.push(generateCar());
+    setInterval(() => carsEnemy.push(generateCar()), 700);
+
 
     app.stage.addChild(background);
     app.stage.addChild(background2);
     app.stage.addChild(car);
-    app.stage.addChild(carEnemy);
 
+
+    setInterval(() => carsEnemy.forEach(car => app.stage.addChild(car)), 700);
+    setInterval(() => carsEnemy.unshift(), 700);
 
     let left = keyboard("ArrowLeft"),
         up = keyboard("ArrowUp"),
@@ -92,7 +97,8 @@ function gameLoop(){
         car.y += car.vy;
     }
 
-    carEnemy.y += carEnemy.vy;
+    carsEnemy.forEach(car => car.y += car.vy);
+
 
     background.y += background.vy;
     background2.y += background2.vy;
@@ -130,7 +136,6 @@ function keyboard(value) {
     window.addEventListener("keydown", downListener);
     window.addEventListener("keyup", upListener);
 
-    // Detach event listeners
     key.unsubscribe = () => {
         window.removeEventListener("keydown", downListener);
         window.removeEventListener("keyup", upListener);
@@ -140,13 +145,16 @@ function keyboard(value) {
 }
 
 function generateCar() {
-    const index = Math.floor(Math.random() * 2);
+    const index = Math.floor(Math.random() * 4);
+    const speed = Math.floor(Math.random() * 7 + 5);
+
+    const indexs = [10, 115, 230, 330];
 
     const newCar = new Sprite(resources["images/carEnemy.png"].texture);
 
-    newCar.x = index ? 230 : 120;
+    newCar.x = indexs[index];
     newCar.y = -80;
-    newCar.vy = 2;
+    newCar.vy = speed;
 
     return newCar;
 }
